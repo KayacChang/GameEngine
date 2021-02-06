@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Canvas from "components/Canvas";
+import { Container } from "pixi.js";
+import { PropsWithChildren } from "react";
+import { StoreProvider, useScene } from "store";
 
-function App() {
+import scenes from "scenes";
+
+function getViewPort(ratio = 16 / 9) {
+  return {
+    width: window.innerHeight * ratio,
+    height: window.innerHeight,
+  };
+}
+
+function GameLayer() {
+  const scene = useScene();
+
+  return <Canvas {...getViewPort()} stage={scenes[scene].game} />;
+}
+
+function UserInterfaceLayer() {
+  const scene = useScene();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="absolute top-0 w-full h-full">{scenes[scene].ui}</main>
   );
 }
 
-export default App;
+function System({ children }: PropsWithChildren<{}>) {
+  return <StoreProvider>{children}</StoreProvider>;
+}
+
+export default function App() {
+  return (
+    <System>
+      <GameLayer />
+
+      <UserInterfaceLayer />
+    </System>
+  );
+}
